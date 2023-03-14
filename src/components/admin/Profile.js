@@ -5,41 +5,51 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Profile = () => {
-  const [dropdownOptions, setDropdownOptions] = useState([]);
-  const [selectedOption, setSelectedOption] = useState('');
-  const [floatValue, setFloatValue] = useState(0.0);
-  const [dateTimeValue, setDateTimeValue] = useState(new Date());
-  const [message, setMessage] = useState('');
+  const [mealOptions, setMealOptions] = useState(["Breakfast", "Lunch", "Dinner"]);
+  const [selectedMealOption, setSelectedMalOption] = useState("");
+  const [foodOptions, setFoodOptions] = useState([]);
+  const [selectedFood, setSelectedFood] = useState('');
+  const [calorieValue, setCalorieValue] = useState(0.0);
+  const [doseDateTime, setDoseDateTime] = useState(new Date());
 
   const userData = JSON.parse(localStorage.getItem('user'));
-  console.log(userData);
+
+  const headers = {
+      headers: { Authorization: `Bearer ${userData['access']}` }
+  };
+
+  const handleMealOptionChange = (event) => {
+    setSelectedMalOption(event.target.value);
+  };
 
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/api/v1/foods/?limit=10000')
-      .then(response => setDropdownOptions(response.data))
+    axios.get('http://127.0.0.1:8000/api/v1/foods/?limit=10000', headers)
+      .then(response => setFoodOptions(response.data))
       .catch(error => console.log(error));
   }, []);
 
   const handleDropdownChange = event => {
-    setSelectedOption(event.target.value);
+    setSelectedFood(event.target.value);
   };
 
   const handleFloatChange = event => {
-    setFloatValue(parseFloat(event.target.value));
+    setCalorieValue(parseFloat(event.target.value));
   };
 
   const handleDateTimeChange = event => {
-    setDateTimeValue(event.target.value);
+    setDoseDateTime(event.target.value);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
     axios.post('http://127.0.0.1:8000/api/v1/users/73707eab-068e-4183-9fcc-ee5a9cbbec11/foods/', {
-      food: selectedOption,
-      calorie_value: floatValue,
-      dose_time: dateTimeValue
-    })
+      meal: selectedMealOption,
+      food: selectedFood,
+      calorie_value: calorieValue,
+      dose_time: doseDateTime
+    }, headers
+    )
     .then(response => {
       toast.success('Form submitted successfully!', { autoClose: 2000 });
     })
@@ -70,19 +80,27 @@ const Profile = () => {
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <label htmlFor="dropdown">Dropdown:</label>
-        <select id="dropdown" value={selectedOption} onChange={handleDropdownChange}>
-          <option value="">Select an option</option>
-          {dropdownOptions['results'] ? dropdownOptions['results'].map(option => (
-            <option key={option.id} value={option.id}>{option.name}</option>
+        <label htmlFor="dropdown">Choose the meal:</label>
+        <select value={selectedMealOption} onChange={handleMealOptionChange}>
+          {mealOptions.map((meal) => (
+            <option value={meal.toLowerCase()} key={meal}>
+              {meal}
+            </option>
+          ))}
+        </select>
+
+        <label htmlFor="dropdown">Choose the food:</label>
+        <select id="dropdown" value={selectedFood} onChange={handleDropdownChange}>
+          {foodOptions['results'] ? foodOptions['results'].map(food => (
+            <option key={food.id} value={food.id}>{food.name}</option>
           )) : null}
         </select>
 
         <label htmlFor="float">Calorie value:</label>
-        <input id="float" type="number" step="0.01" value={floatValue} onChange={handleFloatChange} />
+        <input id="float" type="number" step="0.01" value={calorieValue} onChange={handleFloatChange} />
 
         <label htmlFor="datetime">Dose Time:</label>
-        <input id="datetime" type="datetime-local" value={dateTimeValue} onChange={handleDateTimeChange} />
+        <input id="datetime" type="datetime-local" value={doseDateTime} onChange={handleDateTimeChange} />
 
         <button className="btn btn-primary btn-block">
           <span>Submit</span>

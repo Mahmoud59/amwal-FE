@@ -5,10 +5,10 @@ import "./App.css";
 
 import AuthService from "./services/auth.service";
 
-import Login from "./components/Login";
-import Register from "./components/Register";
-import Home from "./components/Home";
-import Profile from "./components/Profile";
+import Login from "./components/user/Login";
+import Register from "./components/user/Register";
+import Home from "./components/user/Home";
+import Profile from "./components/user/Profile";
 import BoardUser from "./components/BoardUser";
 import BoardModerator from "./components/BoardModerator";
 import BoardAdmin from "./components/BoardAdmin";
