@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import Form from "react-validation/build/form";
 import Input from "react-validation/build/input";
 import CheckButton from "react-validation/build/button";
+import jwt_decode from 'jwt-decode';
 
-import AuthService from "../services/auth.service";
+import AuthService from "../../services/auth.service";
 
 const required = (value) => {
   if (!value) {
@@ -48,7 +49,12 @@ const Login = () => {
     if (checkBtn.current.context._errors.length === 0) {
       AuthService.login(username, password).then(
         () => {
-          navigate("/profile");
+          const userData = JSON.parse(localStorage.getItem('user'));
+          const decodedAccessKey = jwt_decode(userData['access']);
+          if (decodedAccessKey['user_type'] == 'admin')
+            navigate("/user/food/list");
+          else
+            navigate("/");
           window.location.reload();
         },
         (error) => {

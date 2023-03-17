@@ -5,15 +5,14 @@ import "./App.css";
 
 import AuthService from "./services/auth.service";
 
-import Login from "./components/user/Login";
-import Register from "./components/user/Register";
-import Home from "./components/user/Home";
-import Profile from "./components/user/Profile";
-import BoardUser from "./components/BoardUser";
-import BoardModerator from "./components/BoardModerator";
-import BoardAdmin from "./components/BoardAdmin";
+import Login from "./components/users/Login";
+import Register from "./components/users/Register";
+import Home from "./components/users/Home";
+import UserFood from "./components/users/UserFood";
+import FoodList from './components/foods/List';
+import CreateFoodForm from './components/foods/Form';
+import UpdateFoodForm from './components/foods/Form';
 
-// import AuthVerify from "./common/AuthVerify";
 import EventBus from "./common/EventBus";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -22,6 +21,7 @@ const App = () => {
   const [showModeratorBoard, setShowModeratorBoard] = useState(false);
   const [showAdminBoard, setShowAdminBoard] = useState(false);
   const [currentUser, setCurrentUser] = useState(undefined);
+  const [foods, setFoods] = useState([]);
 
   useEffect(() => {
     const user = AuthService.getCurrentUser();
@@ -47,6 +47,7 @@ const App = () => {
     setShowAdminBoard(false);
     setCurrentUser(undefined);
   };
+
 
   return (
     <div>
@@ -119,13 +120,12 @@ const App = () => {
       <div className="container mt-3">
         <Routes>
           <Route exact path={"/"} element={<Home />} />
-          <Route exact path={"/home"} element={<Home />} />
           <Route exact path="/login" element={<Login />} />
           <Route exact path="/register" element={<Register />} />
-          <Route exact path="/profile" element={<Profile />} />
-          <Route path="/user" element={<BoardUser />} />
-          <Route path="/mod" element={<BoardModerator />} />
-          <Route path="/admin" element={<BoardAdmin />} />
+          <Route exact path="/user/food" element={<UserFood />} />
+          <Route exact path="/user/food/list" element={<FoodList />} />
+          <Route exact path="/user/food/create" element={<CreateFoodForm />} />
+          <Route exact path="/user/food/update/:id" element={<UpdateFoodForm />} />
         </Routes>
       </div>
       <ToastContainer />
