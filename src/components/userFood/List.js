@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import jwt_decode from 'jwt-decode';
-import ReactPaginate from 'react-paginate';
 import { useNavigate } from "react-router-dom";
+import { useParams } from 'react-router-dom';
 
 import { Table } from 'react-bootstrap';
 import './../../assests/css/table.css';
 import './../../assests/css/button.css';
 
 
-function TableComponent() {
+function UserFoodList() {
   const navigate = useNavigate();
   
   const [data, setData] = useState([]);
@@ -17,13 +16,10 @@ function TableComponent() {
   const [pageSize, setPageSize] = useState(25);
   const [currentPage, setCurrentPage] = useState(0);
 
+  const { id } = useParams();
+
   const headers = {
     headers: { Authorization: `Bearer ${userData['access']}` }
-  };
-  const decodedAccessKey = jwt_decode(userData['access']);
-
-  const handlePageChange = ({ selected }) => {
-    setCurrentPage(selected);
   };
 
   const handleAddNewDoseClick = () => {
@@ -31,15 +27,15 @@ function TableComponent() {
   };
 
   const handleShowMaxDayClick = () => {
-    navigate("/user/food/limits");
+     navigate(`/user/food/limits`);
   };
 
   const handleEditClick = (dose) => {
     navigate(`/user/food/update/${dose.id}/`);
   };
 
-  useEffect(() => {
-    axios.get(`http://127.0.0.1:8000/api/v1/users/${decodedAccessKey['uuid']}/foods/?limit=${pageSize}`, headers)
+  useEffect((userUUID) => {
+    axios.get(`http://127.0.0.1:8000/api/v1/users/${id}/foods/?limit=${pageSize}`, headers)
       .then(response => setData(response.data['results']))
       .catch(error => console.log(error))
   }, []);
@@ -79,16 +75,8 @@ function TableComponent() {
           ))}
         </tbody>
       </Table>
-      <ReactPaginate
-        previousLabel={'Previous'}
-        nextLabel={'Next'}
-        pageCount={Math.ceil(data.length / pageSize)}
-        onPageChange={handlePageChange}
-        containerClassName={'pagination'}
-        activeClassName={'active'}
-      />
     </div>
   );
 }
 
-export default TableComponent;
+export default UserFoodList;

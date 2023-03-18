@@ -4,6 +4,8 @@ import { Table } from 'react-bootstrap';
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 
+import './../../assests/css/pagination.css';
+
 
 const FoodList = () => {
   const [foods, setFoods] = useState([]);

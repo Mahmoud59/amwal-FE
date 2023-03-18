@@ -7,6 +7,7 @@ import jwt_decode from 'jwt-decode';
 
 import AuthService from "../../services/auth.service";
 
+
 const required = (value) => {
   if (!value) {
     return (
@@ -52,7 +53,7 @@ const Login = () => {
           const userData = JSON.parse(localStorage.getItem('user'));
           const decodedAccessKey = jwt_decode(userData['access']);
           if (decodedAccessKey['user_type'] == 'admin')
-            navigate("/user/food/list");
+            navigate("/foods/list");
           else
             navigate("/");
           window.location.reload();

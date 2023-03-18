@@ -2,14 +2,6 @@ import axios from "axios";
 
 const USER_API_URL = "http://127.0.0.1:8000/api/v1/users/";
 
-const register = (username, email, password) => {
-  return axios.post(USER_API_URL + "signup", {
-    username,
-    email,
-    password,
-  });
-};
-
 const login = (username, password) => {
   return axios
     .post(USER_API_URL + "login/", {
@@ -17,10 +9,7 @@ const login = (username, password) => {
       password,
     })
     .then((response) => {
-      // if (response.data.username) {
-        localStorage.setItem("user", JSON.stringify(response.data));
-      // }
-
+      localStorage.setItem("user", JSON.stringify(response.data));
       return response.data;
     });
 };
@@ -37,7 +26,6 @@ const getCurrentUser = () => {
 };
 
 const AuthService = {
-  register,
   login,
   logout,
   getCurrentUser,

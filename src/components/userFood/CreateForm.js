@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import AuthService from "../../services/auth.service";
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
+import jwt_decode from 'jwt-decode';
+
 import 'react-toastify/dist/ReactToastify.css';
 
-const Profile = () => {
+
+const CreateForm = () => {
   const [mealOptions, setMealOptions] = useState(["Breakfast", "Lunch", "Dinner"]);
   const [selectedMealOption, setSelectedMalOption] = useState("");
   const [foodOptions, setFoodOptions] = useState([]);
@@ -13,6 +15,7 @@ const Profile = () => {
   const [doseDateTime, setDoseDateTime] = useState(new Date());
 
   const userData = JSON.parse(localStorage.getItem('user'));
+  const decodedAccessKey = jwt_decode(userData['access']);
 
   const headers = {
       headers: { Authorization: `Bearer ${userData['access']}` }
@@ -43,7 +46,7 @@ const Profile = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    axios.post('http://127.0.0.1:8000/api/v1/users/73707eab-068e-4183-9fcc-ee5a9cbbec11/foods/', {
+    axios.post(`http://127.0.0.1:8000/api/v1/users/${decodedAccessKey['uuid']}/foods/`, {
       meal: selectedMealOption,
       food: selectedFood,
       calorie_value: calorieValue,
@@ -56,12 +59,12 @@ const Profile = () => {
     .catch(error => {
       try{
         if (error.response.data) {
-          if (typeof(error.response.data) == 'object'){
+          if (typeof(error.response.data) == 'object' && error.response.data.message){
             var errorMessage = error.response.data.message
           } else {
             for (const key in error.response.data) {
               if (error.response.data.hasOwnProperty(key)) {
-                var errorMessage = error.response.data[key][0]
+                var errorMessage = `${key}: ${error.response.data[key][0]}`
               }
             }
           }
@@ -110,4 +113,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default CreateForm;

@@ -1,35 +1,40 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Link } from "react-router-dom";
+import { ToastContainer } from 'react-toastify';
+import jwt_decode from 'jwt-decode';
+
+import 'react-toastify/dist/ReactToastify.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
 import AuthService from "./services/auth.service";
+import EventBus from "./common/EventBus";
 
 import Login from "./components/users/Login";
-import Register from "./components/users/Register";
 import Home from "./components/users/Home";
-import UserFood from "./components/users/UserFood";
+import CreateUserFood from "./components/userFood/CreateForm";
+import UserList from './components/users/List';
 import FoodList from './components/foods/List';
 import CreateFoodForm from './components/foods/Form';
 import UpdateFoodForm from './components/foods/Form';
-
-import EventBus from "./common/EventBus";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import UserFoodLimit from './components/userFood/UserFoodLimit';
+import UpdateUserFood from './components/userFood/UpdateForm';
+import UserFoodList from './components/userFood/List';
 
 const App = () => {
-  const [showModeratorBoard, setShowModeratorBoard] = useState(false);
-  const [showAdminBoard, setShowAdminBoard] = useState(false);
   const [currentUser, setCurrentUser] = useState(undefined);
-  const [foods, setFoods] = useState([]);
+  const [homeURL, sethomeURL] = useState("/");
+  const [userType, setuserType] = useState(undefined);
 
   useEffect(() => {
     const user = AuthService.getCurrentUser();
-
     if (user) {
+      const decodedAccessKey = jwt_decode(user['access']);
       setCurrentUser(user);
-      // setShowModeratorBoard(user.roles.includes("ROLE_MODERATOR"));
-      // setShowAdminBoard(user.roles.includes("ROLE_ADMIN"));
+      if (decodedAccessKey['user_type'] == 'admin'){
+        sethomeURL('/foods/list');
+        setuserType('admin')
+      }
     }
 
     EventBus.on("logout", () => {
@@ -43,45 +48,23 @@ const App = () => {
 
   const logOut = () => {
     AuthService.logout();
-    setShowModeratorBoard(false);
-    setShowAdminBoard(false);
     setCurrentUser(undefined);
+    sethomeURL(undefined);
   };
 
 
   return (
     <div>
       <nav className="navbar navbar-expand navbar-dark bg-dark">
-        <Link to={"/"} className="navbar-brand">
+        <Link to={homeURL} className="navbar-brand">
           Home
         </Link>
         <div className="navbar-nav mr-auto">
-          <li className="nav-item">
-            <Link to={"/home"} className="nav-link">
-              Home
-            </Link>
-          </li>
 
-          {showModeratorBoard && (
+          {userType == 'admin' && (
             <li className="nav-item">
-              <Link to={"/mod"} className="nav-link">
-                Moderator Board
-              </Link>
-            </li>
-          )}
-
-          {showAdminBoard && (
-            <li className="nav-item">
-              <Link to={"/admin"} className="nav-link">
-                Admin Board
-              </Link>
-            </li>
-          )}
-
-          {currentUser && (
-            <li className="nav-item">
-              <Link to={"/user"} className="nav-link">
-                User
+              <Link to={"/users"} className="nav-link">
+                Users
               </Link>
             </li>
           )}
@@ -107,12 +90,6 @@ const App = () => {
                 Login
               </Link>
             </li>
-
-            <li className="nav-item">
-              <Link to={"/register"} className="nav-link">
-                Sign Up
-              </Link>
-            </li>
           </div>
         )}
       </nav>
@@ -121,16 +98,17 @@ const App = () => {
         <Routes>
           <Route exact path={"/"} element={<Home />} />
           <Route exact path="/login" element={<Login />} />
-          <Route exact path="/register" element={<Register />} />
-          <Route exact path="/user/food" element={<UserFood />} />
-          <Route exact path="/user/food/list" element={<FoodList />} />
-          <Route exact path="/user/food/create" element={<CreateFoodForm />} />
-          <Route exact path="/user/food/update/:id" element={<UpdateFoodForm />} />
-        </Routes>
+          <Route exact path="/foods/list" element={<FoodList />} />
+          <Route exact path="/foods/create" element={<CreateFoodForm />} />
+          <Route exact path="/foods/update/:id" element={<UpdateFoodForm />} />
+          <Route exact path="/users" element={<UserList />} />
+          <Route exact path="/user/food/list/:id" element={<UserFoodList />} />
+          <Route exact path="/user/food/create" element={<CreateUserFood />} />
+          <Route exact path="/user/food/update/:id" element={<UpdateUserFood />} />
+          <Route exact path="/user/food/limits" element={<UserFoodLimit />} />
+       </Routes>
       </div>
       <ToastContainer />
-
-      {/* <AuthVerify logOut={logOut}/> */}
     </div>
   );
 };

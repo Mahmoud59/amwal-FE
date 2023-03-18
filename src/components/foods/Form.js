@@ -33,7 +33,7 @@ const FoodForm = () => {
     e.preventDefault();
     axios.put(`http://127.0.0.1:8000/api/v1/foods/${id}/`, { name }, headers)
       .then(res => {
-         navigate("/user/food/list");
+         navigate("/foods/list");
       })
       .catch(err => {
         console.log(err);
@@ -44,7 +44,7 @@ const FoodForm = () => {
     e.preventDefault();
     axios.post('http://127.0.0.1:8000/api/v1/foods/', { name }, headers)
       .then(res => {
-         navigate("/user/food/list");
+         navigate("/foods/list");
       })
       .catch(err => {
         console.log(err);
